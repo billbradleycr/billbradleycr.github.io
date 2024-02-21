@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+<title>Safari bug - hidden iframes</title>
+<link rel="stylesheet" href="../../quirksmode.css">
+<script src="../../quirksmode.js"></script>
+<style>
+<!--
+
+iframe {
+	display: none;
+	border: 2px solid #000000;
+}
+
+-->
+</style>
+<script>
+
+window.onload = function () {
+	document.getElementById('testlink1').onclick = showHide;
+	document.getElementById('testlink2').onclick = showHide;
+	document.getElementById('pagelink1').onclick = loadNew;
+	document.getElementById('pagelink2').onclick = loadNew;
+}
+
+function showHide()
+{
+	var nr = this.id.substring(this.id.length-1);
+	var target = 'test' + nr;
+	var setTo = (this.setTo == 'block') ? 'none' : 'block';
+	if (setTo == 'block')
+		this.firstChild.nodeValue = 'Hide iframe ' + nr;
+	else
+		this.firstChild.nodeValue = 'Show iframe ' + nr;
+	document.getElementById(target).style.display = setTo;
+	this.setTo = setTo;
+}
+
+function loadNew()
+{
+	var nr = this.id.substring(this.id.length-1);
+	var target = 'test' + nr;
+	if (!this.newPage) this.newPage = 1;
+	var newPage = (this.newPage == '2') ? 1 : 2;
+	alert('iframe ' + nr + ' should now contain page ' + newPage);
+	frames[target].location.href = 'iframetest' + newPage + '.html';
+	this.firstChild.nodeValue = 'Load page ' + this.newPage + ' in iframe ' + nr;
+	this.newPage = newPage;
+}
+
+</script>
+</head>
+
+<body class="testpage">
+
+<div id="header"></div>
+
+<h2>Safari bug - hidden iframes</h2>
+
+<p class="intro">Safari doesn't count iframes with <code>display: none</code> at all. They are not
+represented in the <code>frames</code> array and refreshing the pages in them is impossible, too.</p>
+
+<p><a href="#" onclick="alert('onLoad alert: self.frames.length should be 2 and is ' + self.frames.length);">First check
+<code>self.frames.length</code></a>. Safari only counts the iframes when they have <code>display: block</code>, which you
+can toggle below.</p>
+
+<p>Try to load a page into a hidden iframe: Safari doesn't do it.</p>
+
+<p><a href="#" id="testlink1">Show iframe 1</a><br>
+<a href="#" id="pagelink1">Load page 2 in iframe 1</a></p>
+
+<iframe src="iframetest1.html" id="test1" name="test1"></iframe>
+
+<p><a href="#" id="testlink2">Show iframe 2</a><br>
+<a href="#" id="pagelink2">Load page 2 in iframe 2</a></p>
+
+<iframe src="iframetest1.html" id="test2" name="test2"></iframe>
+
+
+<div id="footer"></div>
+</body>
+</html>
